@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraAssess - AI Interview Predictor</title>
+    <!-- Google Fonts: Outfit (300 to 900) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <!-- Premium Dotted Grid Background & Blur Blobs -->
+    <div class="dot-grid"></div>
+    <div class="glow-blob blob-1"></div>
+    <div class="glow-blob blob-2"></div>
+    <div class="glow-blob blob-3"></div>
+
+    <div class="app-layout">
+        <!-- Top Navigation Bar -->
+        <header class="glass-nav">
+            <div class="nav-brand">
+                <div class="logo-box">
+                    <i class="fa-solid fa-leaf"></i>
+                </div>
+                <div>
+                    <h1>Aura<span>Assess</span></h1>
+                    <p>Multimodal Behavior Analytics</p>
+                </div>
+            </div>
+            <div class="nav-controls">
+                <div class="badge status-badge" id="statusBadge">
+                    <span class="status-dot"></span>
+                    <span id="statusText">CALIBRATING</span>
+                </div>
+                <div class="badge timer-badge">
+                    <i class="fa-regular fa-clock"></i>
+                    <span id="sessionTimer">00:00</span>
+                    <span class="timer-max">/01:00</span>
+                </div>
+                <button class="btn btn-calibrate" id="btnCalibrate" title="Recalibrate sensors">
+                    <i class="fa-solid fa-arrows-spin"></i> Reset Baseline
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Workspace -->
+        <main class="dashboard-workspace">
+            
+            <!-- Left Workspace: Webcam Stream & Controls -->
+            <div class="workspace-left">
+                <div class="glass-panel camera-panel">
+                    <div class="panel-info">
+                        <h3><i class="fa-solid fa-circle-dot live-indicator"></i> Sensor Input Stream</h3>
+                        <span class="fps-tag" id="fpsCounter">30 FPS</span>
+                    </div>
+                    <div class="camera-viewport">
+                        <video id="webcam" autoplay playsinline muted style="display:none;"></video>
+                        <canvas id="overlayCanvas"></canvas>
+                        
+                        <!-- Floating Alerts inside Viewport -->
+                        <div class="alert-banner" id="pacifyingAlert">
+                            <i class="fa-solid fa-bell animate-bounce"></i> Somatic Self-Touch Detected
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <label class="switch-container">
+                            <input type="checkbox" id="chkShowMesh" checked>
+                            <span class="switch-slider"></span>
+                        </label>
+                        <span>Draw AI Face & Pose Skeleton Mesh</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Workspace: Analytics Dashboard -->
+            <div class="workspace-right" id="dashboardSection">
+                
+                <!-- Hero State Display (Glows & Pulsing Ring) -->
+                <div class="glass-panel hero-state-card" id="stateCard">
+                    <div class="vibe-ring-container">
+                        <div class="vibe-ring" id="vibeRing"></div>
+                        <i class="fa-solid fa-heart-pulse vibe-icon" id="vibeIcon"></i>
+                    </div>
+                    <div class="state-details">
+                        <span class="lbl-tracker">REAL-TIME CLASSIFICATION</span>
+                        <h2 id="stateValue">Calibrating...</h2>
+                        <p id="stateDesc">Aligning computer vision coordinates. Stand by.</p>
+                    </div>
+                </div>
+
+                <!-- 2x2 Metric Cards Grid -->
+                <div class="metrics-grid">
+                    <!-- Eye Blink Rate -->
+                    <div class="glass-panel metric-card">
+                        <div class="card-icon-header">
+                            <i class="fa-solid fa-eye text-cyan"></i>
+                            <span class="lbl">EYE BLINKS</span>
+                        </div>
+                        <div class="card-body">
+                            <h3 id="metricBlinks">-- <span class="unit">BPM</span></h3>
+                            <p class="desc">Arousal & stress rate tracker</p>
+                        </div>
+                    </div>
+
+                    <!-- Forehead Tension -->
+                    <div class="glass-panel metric-card">
+                        <div class="card-icon-header">
+                            <i class="fa-solid fa-head-side-virus text-orange"></i>
+                            <span class="lbl">FOREHEAD</span>
+                        </div>
+                        <div class="card-body">
+                            <h3 id="metricForehead">Relaxed</h3>
+                            <p class="desc">Brow furrowing index (AU4)</p>
+                        </div>
+                    </div>
+
+                    <!-- Postural Sway -->
+                    <div class="glass-panel metric-card">
+                        <div class="card-icon-header">
+                            <i class="fa-solid fa-arrows-left-right text-magenta"></i>
+                            <span class="lbl">POSTURE SWAY</span>
+                        </div>
+                        <div class="card-body">
+                            <h3 id="metricSway">Stable</h3>
+                            <p class="desc">Restlessness variance score</p>
+                        </div>
+                    </div>
+
+                    <!-- Hand Gesturing -->
+                    <div class="glass-panel metric-card">
+                        <div class="card-icon-header">
+                            <i class="fa-solid fa-hands text-yellow"></i>
+                            <span class="lbl">HAND GESTURES</span>
+                        </div>
+                        <div class="card-body">
+                            <h3 id="metricGestures">Natural</h3>
+                            <p class="desc">Wrist gesturing index</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Likelihood Distributions -->
+                <div class="glass-panel probabilities-panel">
+                    <div class="panel-info">
+                        <h3><i class="fa-solid fa-chart-line"></i> State Likelihood Distribution</h3>
+                    </div>
+                    <div class="prob-progress-list">
+                        <div class="prob-row">
+                            <div class="prob-header">
+                                <span class="label"><i class="fa-solid fa-bolt label-stress"></i> Stress</span>
+                                <span class="val" id="probStressVal">25%</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill fill-stress" id="probStressBar" style="width: 25%;"></div>
+                            </div>
+                        </div>
+                        <div class="prob-row">
+                            <div class="prob-header">
+                                <span class="label"><i class="fa-solid fa-leaf label-chill"></i> Chill</span>
+                                <span class="val" id="probChillVal">25%</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill fill-chill" id="probChillBar" style="width: 25%;"></div>
+                            </div>
+                        </div>
+                        <div class="prob-row">
+                            <div class="prob-header">
+                                <span class="label"><i class="fa-solid fa-shield-halved label-confident"></i> Confident</span>
+                                <span class="val" id="probConfidentVal">25%</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill fill-confident" id="probConfidentBar" style="width: 25%;"></div>
+                            </div>
+                        </div>
+                        <div class="prob-row">
+                            <div class="prob-header">
+                                <span class="label"><i class="fa-solid fa-crown label-overconfident"></i> Overconfident</span>
+                                <span class="val" id="probOverconfidentVal">25%</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill fill-overconfident" id="probOverconfidentBar" style="width: 25%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT SIDE OVERLAY: Premium Assessment Report -->
+            <div class="workspace-right report-panel" id="reportSection" style="display:none;">
+                <div class="glass-panel report-header-panel">
+                    <div class="report-title-desc">
+                        <h2><i class="fa-solid fa-square-poll-vertical text-emerald"></i> Diagnostic Session Assessment</h2>
+                        <p>Aggregated analysis of candidate kinesics & vocal dynamics</p>
+                    </div>
+                    <button class="btn btn-restart" id="btnRestart">
+                        <i class="fa-solid fa-rotate-right"></i> New Session
+                    </button>
+                </div>
+
+                <div class="glass-panel report-summary-card">
+                    <div class="dominant-badge-container">
+                        <div class="rep-badge" id="repDominantCircle">
+                            <h3 id="repDominantPct">85%</h3>
+                            <span id="repDominantState">Confident</span>
+                        </div>
+                    </div>
+                    <div class="rep-summary-text">
+                        <h3>Summary Behavioral Profile</h3>
+                        <p id="repSummaryText">Calculating interview outcome analysis...</p>
+                    </div>
+                </div>
+
+                <div class="report-details-grid">
+                    <div class="glass-panel detail-card">
+                        <div class="card-icon-header">
+                            <i class="fa-solid fa-head-side-virus text-orange"></i>
+                            <span class="lbl">Facial Geometry & Forehead</span>
+                        </div>
+                        <p id="repForehead">Normal facial dynamics.</p>
+                    </div>
+
+                    <div class="glass-panel detail-card">
+                        <div class="card-icon-header">
+                            <i class="fa-solid fa-eye text-cyan"></i>
+                            <span class="lbl">Gaze Alignment & Blinking</span>
+                        </div>
+                        <p id="repGaze">Sustained eye contact and stable focus index.</p>
+                    </div>
+
+                    <div class="glass-panel detail-card">
+                        <div class="card-icon-header">
+                            <i class="fa-solid fa-hand text-magenta"></i>
+                            <span class="lbl">Somatic Pacifying Gestures</span>
+                        </div>
+                        <p id="repSelfTouch">No self-soothing behaviors detected.</p>
+                    </div>
+
+                    <div class="glass-panel detail-card">
+                        <div class="card-icon-header">
+                            <i class="fa-solid fa-arrows-left-right text-yellow"></i>
+                            <span class="lbl">Posture Leaning & Torso Sway</span>
+                        </div>
+                        <p id="repSway">Stable seating posture with natural movements.</p>
+                    </div>
+                </div>
+
+                <div class="glass-panel recommendation-panel">
+                    <h3><i class="fa-solid fa-gears"></i> AI Outcome Prediction Recommendation</h3>
+                    <p id="repRecommendation">Calculating prediction...</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Main Client Controller -->
+    <script src="app.js"></script>
+</body>
+</html>
