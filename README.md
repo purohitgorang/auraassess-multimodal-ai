@@ -36,7 +36,7 @@ Webcam / Microphone ──> MediaPipe Video Pipeline  ──┐
 ### 1. Installation
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/auraassess.git
+git clone https://github.com/purohitgorang/auraassess-multimodal-ai.git
 cd auraassess
 
 # Install dependencies
