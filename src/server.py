@@ -185,5 +185,4 @@ def shutdown_event():
 
 if __name__ == "__main__":
     # Run FastAPI web app using Uvicorn
-    # Accessible via http://localhost:8000
-    uvicorn.run(app, host="127.0.0.1", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=8080)

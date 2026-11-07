@@ -7,5 +7,9 @@ echo ============================================================
 echo.
 echo Local Live URL: http://localhost:8080
 echo.
-python src/server.py
+if exist .venv\Scripts\python.exe (
+    .venv\Scripts\python.exe src/server.py
+) else (
+    python src/server.py
+)
 pause
