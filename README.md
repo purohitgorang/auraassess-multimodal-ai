@@ -106,8 +106,3 @@ pip install -r requirements.txt
 python main.py
 ```
 Open your browser to: **`http://localhost:8080`**
-
----
-
-## 📄 License
-MIT License. Copyright (c) 2026 Gorang Purohit.
